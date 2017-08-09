@@ -47,6 +47,9 @@ for row in rows:
         if i == 4:
             address = block[i].find("a").string
             print("Winning miner: " + address)
+        if i == 6:
+            difficulty = block[i].string
+            print("Difficulty: " + difficulty)
         if i == 7:
             hRate = block[i].string
             print("Network hasrate: " + hRate)
