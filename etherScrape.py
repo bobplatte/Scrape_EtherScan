@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 base_url = "https://etherscan.io/blocks"
 
@@ -26,43 +27,50 @@ for i in r:
     print(i["title"])
 '''
 
-for x in range(3):
+with open("etherData.csv", 'a') as f:
+    writer = csv.writer(f, quoting = csv.QUOTE_NONNUMERIC)
+    writer.writerow(["Block", "Date", "Transactions", "Miner",
+                    "Difficulty", "Hashrate", "Reward"])
 
-    print("************ Page " + str(x + 1) + " ************")
+    for x in range(3):
 
-    raw = requests.get(base_url + "?p=" + str(x))
+        print("************ Page " + str(x + 1) + " ************")
 
-    data = raw.text
+        raw = requests.get(base_url + "?p=" + str(x))
 
-    soup = BeautifulSoup(data, "lxml")
+        data = raw.text
 
-    rows = soup.find("tbody").find_all("tr")
+        soup = BeautifulSoup(data, "lxml")
 
-    for row in rows:
-        block = row.find_all("td")
-        for i in range(len(block)):
-            if i == 0:
-                block_number = block[i].string
-                print("Block: " + block_number)
-            if i == 1:
-                time = block[i].find("span", title = True)
-                print(time["title"])
-            if i == 2:
-                txs = block[i].string
-                print("Transactions included: " + txs)
-            if i == 4:
-                address = block[i].find("a").string
-                print("Winning miner: " + address)
-            if i == 6:
-                difficulty = block[i].string
-                print("Difficulty: " + difficulty)
-            if i == 7:
-                hRate = block[i].string
-                print("Network hasrate: " + hRate)
-            if i == 8:
-                reward_raw = block[i].contents
-                reward = reward_raw[0] + "." + reward_raw[2]
-                print("Mining reward: " + reward)
-            else:
-                pass
-        print("\n\n")
+        rows = soup.find("tbody").find_all("tr")
+
+        for row in rows:
+            block = row.find_all("td")
+            eth_data = []
+            for i in range(len(block)):
+
+                if i == 0:
+                    block_number = block[i].string
+                    eth_data.append(block_number)
+                if i == 1:
+                    time = block[i].find("span", title = True)
+                    eth_data.append(time["title"])
+                if i == 2:
+                    txs = block[i].string
+                    eth_data.append(txs)
+                if i == 4:
+                    address = block[i].find("a").string
+                    eth_data.append(address)
+                if i == 6:
+                    difficulty = block[i].string
+                    eth_data.append(difficulty)
+                if i == 7:
+                    hRate = block[i].string
+                    eth_data.append(hRate)
+                if i == 8:
+                    reward_raw = block[i].contents
+                    reward = reward_raw[0] + "." + reward_raw[2]
+                    eth_data.append(reward)
+                else:
+                    pass
+            writer.writerow(eth_data)
