@@ -33,7 +33,7 @@ with open("etherData.csv", 'a') as f:
 
     # Sample range for testing.
     # To scrape all data loop through range(total_pages)
-    for x in range(20):
+    for x in range(6100, total_pages):
 
         # Print to console so you don't lose your mind
         if (x+1)%10 == 0:
@@ -59,33 +59,39 @@ with open("etherData.csv", 'a') as f:
             # Scrape the data we want.
             # Note len(block) = 9 (Height, Age, ... , Reward)
             for i in range(len(block)):
-                if i == 0:
-                    block_number = block[i].string
-                    eth_data.append(block_number)
-                if i == 1:
-                    time = block[i].find("span", title = True)
-                    eth_data.append(time["title"])
-                if i == 2:
-                    txs = block[i].string
-                    eth_data.append(txs)
-                if i == 4:
-                    address = block[i].find("a").string
-                    eth_data.append(address)
-                if i == 6:
-                    difficulty = block[i].string
-                    eth_data.append(difficulty)
-                if i == 7:
-                    hRate = block[i].string
-                    eth_data.append(hRate)
-                if i == 8:
-                    reward_raw = block[i].contents
-                    if len(reward_raw) == 1:
-                        reward = reward_raw[0]
+                try:
+                    if i == 0:
+                        block_number = block[i].string
+                        eth_data.append(block_number)
+                    if i == 1:
+                        time = block[i].find("span", title = True)
+                        eth_data.append(time["title"])
+                    if i == 2:
+                        txs = block[i].string
+                        eth_data.append(txs)
+                    if i == 4:
+                        address = block[i].find("a").string
+                        eth_data.append(address)
+                    if i == 6:
+                        difficulty = block[i].string
+                        eth_data.append(difficulty)
+                    if i == 7:
+                        hRate = block[i].string
+                        eth_data.append(hRate)
+                    if i == 8:
+                        reward_raw = block[i].contents
+                        if len(reward_raw) == 1:
+                            reward = reward_raw[0]
+                        else:
+                            reward = reward_raw[0] + "." + reward_raw[2]
+                        eth_data.append(reward)
                     else:
-                        reward = reward_raw[0] + "." + reward_raw[2]
-                    eth_data.append(reward)
-                else:
-                    pass
+                        pass
+                except:
+                    print("Error on page " + str(x+1) +
+                    "\n\nRaw row data: " + str(row) +
+                    "\n\nItem number: " + str(i))
+
 
             # Write to csv
             writer.writerow(eth_data)
